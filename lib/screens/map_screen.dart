@@ -21,6 +21,7 @@ class _MapScreenState extends State<MapScreen> {
   bool isInit = false;
   bool isLoading = false;
   String distance, time;
+  Timer timer;
 
   // this set will hold my markers
   Set<Marker> _markers = {};
@@ -61,7 +62,7 @@ class _MapScreenState extends State<MapScreen> {
       isLoading = false;
     });
 
-    Timer.periodic(Duration(seconds: 5), (timer) {
+    timer = Timer.periodic(Duration(seconds: 5), (timer) {
       update(val);
     });
   }
@@ -87,7 +88,6 @@ class _MapScreenState extends State<MapScreen> {
         position: destLatLng,
       ));
     });
-    print(_markers);
   }
 
   setPolylines(LatLng sourceLatLng, LatLng destLatLng) async {
@@ -117,8 +117,6 @@ class _MapScreenState extends State<MapScreen> {
       // end up showing up on the map
       _polylines.add(polyline);
     });
-    print(polylinePoints);
-    print(polylineCoordinates);
   }
 
   Future<void> getPermission() async {
@@ -141,7 +139,6 @@ class _MapScreenState extends State<MapScreen> {
         return;
       }
     }
-    print("here");
     _userLocation = await _location.getLocation();
   }
 
@@ -150,7 +147,6 @@ class _MapScreenState extends State<MapScreen> {
     await getPermission();
     try {
       _location.onLocationChanged.listen((LocationData currentLocation) {
-        print(currentLocation);
         // Use current location
         setState(() {
           _userLocation = currentLocation;
@@ -188,6 +184,22 @@ class _MapScreenState extends State<MapScreen> {
     }
   }
 
+  void stop() {
+    setState(() {
+      if (timer.isActive) {
+        timer.cancel();
+      }
+      timer = null;
+      distance = null;
+      time = null;
+
+      _markers = {};
+      _polylines = {};
+      polylineCoordinates = [];
+      polylinePoints = PolylinePoints();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     bool navigate = distance != null && time != null;
@@ -198,38 +210,41 @@ class _MapScreenState extends State<MapScreen> {
       body: Container(
         child: Stack(
           children: [
-            Container(
-              height: navigate
-                  ? MediaQuery.of(context).size.height * 0.85
-                  : double.infinity,
-              child: GoogleMap(
-                initialCameraPosition: CameraPosition(
-                  target: LatLng(100, 100),
-                ),
-                markers: _markers,
-                polylines: _polylines,
-                zoomControlsEnabled: true,
-                myLocationEnabled: true,
-                myLocationButtonEnabled: true,
-                onMapCreated: (controller) {
-                  _mapController = controller;
-                  if (isInit == false && _userLocation != null) {
-                    setState(() {
-                      isInit = true;
-                    });
-                    _mapController.animateCamera(
-                      CameraUpdate.newCameraPosition(
-                        CameraPosition(
-                          target: LatLng(
-                            _userLocation.latitude,
-                            _userLocation.longitude,
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: navigate
+                    ? MediaQuery.of(context).size.height * 0.85
+                    : double.infinity,
+                child: GoogleMap(
+                  initialCameraPosition: CameraPosition(
+                    target: LatLng(100, 100),
+                  ),
+                  markers: _markers,
+                  polylines: _polylines,
+                  zoomControlsEnabled: true,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  onMapCreated: (controller) {
+                    _mapController = controller;
+                    if (isInit == false && _userLocation != null) {
+                      setState(() {
+                        isInit = true;
+                      });
+                      _mapController.animateCamera(
+                        CameraUpdate.newCameraPosition(
+                          CameraPosition(
+                            target: LatLng(
+                              _userLocation.latitude,
+                              _userLocation.longitude,
+                            ),
+                            zoom: 16,
                           ),
-                          zoom: 16,
                         ),
-                      ),
-                    );
-                  }
-                },
+                      );
+                    }
+                  },
+                ),
               ),
             ),
             Column(
@@ -244,18 +259,45 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 if (navigate)
                   Container(
-                    color: Colors.white54,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.vertical(
+                        bottom: Radius.circular(30),
+                      ),
+                    ),
                     alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height * 0.1,
                     width: double.infinity,
-                    height: 100,
                     child: Row(
-                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text('distance: $distance'),
-                        SizedBox(
-                          width: 20,
+                        Expanded(
+                          flex: 8,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text('distance: $distance'),
+                              Text('duration: $time'),
+                            ],
+                          ),
                         ),
-                        Text('duration: $time'),
+                        Expanded(
+                          flex: 2,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(30),
+                            ),
+                            child: Container(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              child: RaisedButton(
+                                color: Colors.red,
+                                onPressed: stop,
+                                child: Text('הפסק'),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -267,13 +309,7 @@ class _MapScreenState extends State<MapScreen> {
                 child: Container(
                   alignment: Alignment.center,
                   width: double.infinity,
-                  height: MediaQuery.of(context).size.height * 0.86,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.vertical(
-                      bottom: Radius.circular(20),
-                    ),
-                  ),
+                  height: 80,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

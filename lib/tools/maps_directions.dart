@@ -35,7 +35,6 @@ class MapsDirections {
     final url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=$useraddress&destination=$whereToGo'
         '&key=$_key';
-    print(url);
     try {
       final response = await http.get(
         url,
@@ -44,7 +43,6 @@ class MapsDirections {
         },
       );
       final responseData = json.decode(response.body);
-      print(responseData);
       return responseData;
     } catch (error) {
       throw error;
