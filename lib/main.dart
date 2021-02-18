@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:locationAlarm/screens/main_screen.dart';
 
 import './screens/map_screen.dart';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MapScreen(),
+      home: MainScreen(),
     );
   }
 }
