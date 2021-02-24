@@ -48,4 +48,25 @@ class MapsDirections {
       throw error;
     }
   }
+
+  static Future<dynamic> getDirectionsUpdate(
+      LatLng userLocation, LatLng whereToGo) async {
+    final url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${userLocation.latitude},${userLocation.longitude}&destination=${whereToGo.latitude},${whereToGo.longitude}'
+        '&key=$_key';
+
+    print(url);
+    try {
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+      final responseData = json.decode(response.body);
+      return responseData;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

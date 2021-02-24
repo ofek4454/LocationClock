@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:locationAlarm/controller.dart';
+import 'package:provider/provider.dart';
 
 class ModeChooser extends StatefulWidget {
-  final void Function(bool modeTime) changeMode;
+  final void Function(WakeUpBy modeTime) changeMode;
 
   ModeChooser(this.changeMode);
 
@@ -10,7 +12,6 @@ class ModeChooser extends StatefulWidget {
 }
 
 class _ModeChooserState extends State<ModeChooser> {
-  bool modeTime = false;
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -27,7 +28,11 @@ class _ModeChooserState extends State<ModeChooser> {
           AnimatedPositioned(
             duration: Duration(milliseconds: 500),
             curve: Curves.fastOutSlowIn,
-            right: modeTime ? screenSize.width * 0.35 : 0,
+            right:
+                Provider.of<AppController>(context, listen: false).wakeUpBy ==
+                        WakeUpBy.Time
+                    ? screenSize.width * 0.35
+                    : 0,
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
@@ -43,9 +48,8 @@ class _ModeChooserState extends State<ModeChooser> {
                 child: InkWell(
                   onTap: () {
                     setState(() {
-                      modeTime = false;
+                      widget.changeMode(WakeUpBy.Distance);
                     });
-                    widget.changeMode(modeTime);
                   },
                   child: Center(
                     child: Text('לפי מרחק'),
@@ -56,9 +60,8 @@ class _ModeChooserState extends State<ModeChooser> {
                 child: InkWell(
                   onTap: () {
                     setState(() {
-                      modeTime = true;
+                      widget.changeMode(WakeUpBy.Time);
                     });
-                    widget.changeMode(modeTime);
                   },
                   child: Center(
                     child: Text('לפי זמן'),

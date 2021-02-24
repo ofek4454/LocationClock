@@ -1,7 +1,9 @@
 import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:locationAlarm/controller.dart';
 import 'package:locationAlarm/screens/map_screen.dart';
 import 'package:locationAlarm/screens/settings_screen.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -23,7 +25,9 @@ class _MainScreenState extends State<MainScreen> {
         return MapScreen();
         break;
       case 1:
-        return SettingsScreen();
+        return SettingsScreen(() => setState(() {
+              _currentIndex = 0;
+            }));
         break;
 
       default:
@@ -34,6 +38,10 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Provider.of<AppController>(context, listen: false);
+    if (controller.wakeUpBy == null) {
+      controller.loadData();
+    }
     return Scaffold(
       bottomNavigationBar: BubbleBottomBar(
         hasNotch: true,
