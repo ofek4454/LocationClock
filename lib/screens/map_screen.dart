@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:provider/provider.dart';
@@ -22,6 +24,31 @@ class _MapScreenState extends State<MapScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!isInit) {
+      Provider.of<AppController>(context, listen: false).ring =
+          (String message) {
+        FlutterRingtonePlayer.playRingtone(
+          asAlarm: true,
+          looping: true,
+          volume: 1,
+        );
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text(message),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    FlutterRingtonePlayer.stop();
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('סגור'),
+                )
+              ],
+            );
+          },
+        );
+      };
       if (Provider.of<AppController>(context, listen: false).userLocation ==
           null) {
         getLocation();

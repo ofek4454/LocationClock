@@ -23,6 +23,8 @@ class AppController with ChangeNotifier {
   WakeUpBy _wakeUpBy;
   int _timeToWake;
   double _distanceToWake;
+  Function ring;
+  bool wasRing = false;
 
   // this set will hold my markers
   Set<Marker> _markers = {};
@@ -164,25 +166,33 @@ class AppController with ChangeNotifier {
         await MapsDirections.getDirectionsUpdate(userLanLng, _destLatLng);
     _distance = result['routes'][0]['legs'][0]['distance']['text'];
     _time = result['routes'][0]['legs'][0]['duration']['text'];
+    int formatTime;
+    if (_time.contains('mins')) {
+      formatTime = int.tryParse(_time.replaceAll('mins', ''));
+    } else if (time.contains('min')) {
+      formatTime = int.tryParse(_time.replaceAll('min', ''));
+    }
+
+    final formatDistance = double.tryParse(_distance.replaceAll('km', ''));
     notifyListeners();
-    if (int.parse(_time) == 0 || double.parse(_distance) <= 0.1) {
+    if (formatTime == 0 || formatDistance <= 0.1) {
       //arrive
-      ring();
+      ring('הגענו!');
       stop();
     }
 
     if (_wakeUpBy == WakeUpBy.Time) {
-      if (int.parse(_time) <= _timeToWake) {
-        ring();
+      if (formatTime <= _timeToWake && !wasRing) {
+        wasRing = true;
+        ring('אנחנו עומדים להגיע!');
       }
     } else {
-      if (double.parse(_distance) <= _distanceToWake) {
-        ring();
+      if (formatDistance <= _distanceToWake && !wasRing) {
+        wasRing = true;
+        ring('אנחנו עומדים להגיע!');
       }
     }
   }
-
-  void ring() {}
 
   void stop() {
     if (_timer.isActive) {
@@ -196,6 +206,7 @@ class AppController with ChangeNotifier {
     _polylines = {};
     _polylineCoordinates = [];
     _polylinePoints = PolylinePoints();
+    wasRing = false;
   }
 
   Future<void> getPermission() async {
