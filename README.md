@@ -8,19 +8,12 @@ on every change in user location the app will check if we are close enough to th
 and if we are the app will start ringing with the phone default ringtone and says that we are getting cloder to the location.
 after it the app will ring when we arrived.
 
+## Expamples
+![Main app screen](https://user-images.githubusercontent.com/17598441/109814975-c7ad4900-7c37-11eb-82dd-844c023c5827.png)
+
+example video
+https://user-images.githubusercontent.com/17598441/109815029-dac01900-7c37-11eb-8b47-d6ac0a7eb092.mov
 
 
 
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
