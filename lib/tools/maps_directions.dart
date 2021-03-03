@@ -2,17 +2,16 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:locationAlarm/key.dart';
 
 class MapsDirections {
-  static const _key = 'AIzaSyDyQRRzsq82el_MZENIAsxRC-RmYVAbBdk';
-
   static String get key {
-    return _key;
+    return GOOGLE_API_KEY;
   }
 
   static Future<String> getLocationaddress(LatLng userLocation) async {
     final url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation.latitude},${userLocation.longitude}&key=$_key';
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${userLocation.latitude},${userLocation.longitude}&key=$key';
     try {
       final response = await http.get(
         url,
@@ -34,7 +33,7 @@ class MapsDirections {
     print(useraddress);
     final url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=$useraddress&destination=$whereToGo'
-        '&key=$_key';
+        '&key=$key';
     try {
       final response = await http.get(
         url,
@@ -53,7 +52,7 @@ class MapsDirections {
       LatLng userLocation, LatLng whereToGo) async {
     final url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${userLocation.latitude},${userLocation.longitude}&destination=${whereToGo.latitude},${whereToGo.longitude}'
-        '&key=$_key';
+        '&key=$key';
 
     print(url);
     try {
